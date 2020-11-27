@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Openlayer Feature 绘制点和圆</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id='map'></div>
+    <!-- 引入openlayers -->
+    <script src="https://openlayers.org/en/v5.3.0/build/ol.js"></script>
+    <script>
+        // 地图图层
+        let OSMLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        });
+        // 点图层
+        let pointLayer = new ol.layer.Vector({
+            source: new ol.source.Vector()
+        });
+        // 圆图层
+        let circleLayer = new ol.layer.Vector({
+            source: new ol.source.Vector()
+        });
+
+        // 创建地图
+        let map = new ol.Map({
+            // 设置地图图层
+            layers: [OSMLayer, pointLayer, circleLayer],
+            // 设置显示地图的视图
+            view: new ol.View({
+                zoom: 17, // 地图显示层级
+                center: [104.06, 30.67],
+                projection: 'EPSG:4326', // 指定投影使用EPSG:4326
+            }),
+            target: 'map' // 地图容器
+        });
+
+        // 添加点，通过ol.geom.Point确认点坐标
+        let point = new ol.Feature({
+            geometry: new ol.geom.Point([104.06, 30.67])
+        });
+        // 设置点样式
+        let pointStyle = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 2,
+                fill: new ol.style.Fill({
+                    color: 'red', // 填充颜色
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'red', // 线条颜色
+                    size: 1 //线条粗细
+                })
+            })
+        })
+        point.setStyle(pointStyle);
+        // 添加点到点图层
+        pointLayer.getSource().addFeature(point);
+
+        // 添加圆，通过ol.geom.Point确认圆中心点坐标
+        let circle = new ol.Feature({
+            geometry: new ol.geom.Point([104.06, 30.67])
+        });
+        // 设置圆样式
+        let circleStyle = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 20,
+                stroke: new ol.style.Stroke({
+                    color: 'green',
+                    size: 2
+                })
+            })
+        });
+        circle.setStyle(circleStyle);
+        // 添加圆到图层
+        circleLayer.getSource().addFeature(circle);
+    </script>
+</body>
+
+</html>

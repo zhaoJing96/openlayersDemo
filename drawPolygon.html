@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openlayers 绘制不规则多边形</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id='map'></div>
+    <!-- 引入openlayers -->
+    <script src="https://openlayers.org/en/v5.3.0/build/ol.js"></script>
+    <script>
+        // 实例化一个矢量图层作为绘制图层
+        let layer = new ol.layer.Vector({
+            source: new ol.source.Vector()
+        });
+        // 地图初始化
+        let map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                layer
+            ],
+            view: new ol.View({
+                center: new ol.proj.transform([104.06, 30.67], 'EPSG:4326', 'EPSG:3857'),
+                zoom: 17
+            }),
+            target: 'map'
+        });
+
+        // 绘制不规则多边形
+        let drawPolygon = new ol.interaction.Draw({
+            type: 'Polygon', // 勾绘的要素包含的geometry类型
+            source: layer.getSource(), // 矢量图层vector的矢量数据集source
+            style: new ol.style.Style({ // 指定勾绘要素的样式
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({
+                        color: '#ffcc33'
+                    })
+                })
+            }),
+            maxPoints: 5, // 绘制单个要素（面和线）最多的点数限制
+            minPoints: 3 // 绘制单个要素（面和线）最少的点数限制 绘制面最小出现双击两次依然绘制成功
+        });
+        map.addInteraction(drawPolygon);
+    </script>
+</body>
+
+</html>

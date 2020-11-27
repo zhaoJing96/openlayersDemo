@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openlayers 使用LineString绘制多边形</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id='map'></div>
+    <!-- 引入openlayers -->
+    <script src="https://openlayers.org/en/v5.3.0/build/ol.js"></script>
+    <script>
+        // 实例化一个矢量图层作为绘制图层
+        let layer = new ol.layer.Vector({
+            source: new ol.source.Vector()
+        });
+        // 地图初始化
+        let map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                layer
+            ],
+            view: new ol.View({
+                center: new ol.proj.transform([104.06, 30.67], 'EPSG:4326', 'EPSG:3857'),
+                zoom: 17
+            }),
+            target: 'map'
+        });
+
+
+        // 通过LineString类型 + maxPonits:2绘制四边形
+        let drawShape = new ol.interaction.Draw({
+            type: 'LineString',
+            source: layer.getSource(),
+            style: new ol.style.Style({ // 绘制元素样式、不设置采用统一Vector图层样式
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({
+                        color: '#ffcc33'
+                    })
+                })
+            }),
+            maxPoints: 2,
+            geometryFunction: function (coordinates, geometry) {
+                if (!geometry) {
+                    geometry = new ol.geom.Polygon([]);
+                }
+                let start = coordinates[0];
+                let end = coordinates[1];
+                geometry.setCoordinates([
+                    [
+                        start,
+                        [start[0], end[1]],
+                        end,
+                        [end[0], start[1]],
+                        start
+                    ]
+                ]);
+                return geometry;
+            }
+        });
+        map.addInteraction(drawShape);
+    </script>
+</body>
+
+</html>

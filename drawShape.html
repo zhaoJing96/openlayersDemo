@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openlayers 绘制基础点线面</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id='map'></div>
+    <!-- 引入openlayers -->
+    <script src="https://openlayers.org/en/v5.3.0/build/ol.js"></script>
+    <script>
+        /**
+        * 使用new ol.interaction.Draw 绘制图形，可设置freehand属性为true开启手绘模式（随意绘制曲线或者直线）
+        */
+
+        // 实例化一个矢量图层作为绘制图层
+        let layer = new ol.layer.Vector({
+            source: new ol.source.Vector(),
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    size: 2
+                }),
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                }),
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({
+                        color: '#ffcc33'
+                    })
+                })
+            })
+        });
+        // 地图初始化
+        let map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                layer
+            ],
+            view: new ol.View({
+                center: new ol.proj.transform([104.06, 30.67], 'EPSG:4326', 'EPSG:3857'),
+                zoom: 17
+            }),
+            target: 'map'
+        });
+
+        // 绘制点
+        let drawPoint = new ol.interaction.Draw({
+            type: 'Point', // Point（单点）、MultiPoint（多点）
+            source: layer.getSource()
+        });
+        // map.addInteraction(drawPoint);
+
+        // 绘制线
+        let drawLine = new ol.interaction.Draw({
+            type: 'LineString', // LineString、MultiLineString
+            source: layer.getSource(),
+            freehand: true // 手绘模式
+        });
+        map.addInteraction(drawLine);
+
+        // 绘制圆
+        let drawCircle = new ol.interaction.Draw({
+            type: 'Circle',
+            source: layer.getSource()
+        });
+        map.addInteraction(drawCircle);
+
+        // 取消绘制
+        // map.removeInteraction(drawCircle);
+    </script>
+</body>
+
+</html>

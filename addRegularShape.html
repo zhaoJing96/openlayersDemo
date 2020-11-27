@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openlayer Feature 绘制规则图形</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id='map'></div>
+    <!-- 引入openlayers -->
+    <script src="https://openlayers.org/en/v5.3.0/build/ol.js"></script>
+    <script>
+        // 设置图形样式
+        let shapeStyleFunction = function (feature) {
+            let type = feature.get('type');
+            let style = null;
+            if (type === 'shape') {
+                // 绘制三角形样式
+                style = new ol.style.Style({
+                    image: new ol.style.RegularShape({
+                        points: 3, // 设置顶点个数
+                        radius: 20, // 设置图形大小
+                        stroke: new ol.style.Stroke({ // 边缘线颜色
+                            color: 'green', // 设置图形边框颜色
+                            size: 2
+                        })
+                    })
+                });
+            } else if (type === 'square') {
+                // 绘制正方形样式
+                style = new ol.style.Style({
+                    image: new ol.style.RegularShape({
+                        points: 4,
+                        radius: 10,
+                        stroke: new ol.style.Stroke({
+                            color: 'red',
+                            size: 2
+                        })
+                    })
+                });
+            } else if (type === 'star') {
+                // 绘制五角星样式
+                style = new ol.style.Style({
+                    image: new ol.style.RegularShape({
+                        points: 5, // 设置顶点数
+                        radius1: 20, // 设置外圈大小
+                        radius2: 10, // 设置内圈大小
+                        stroke: new ol.style.Stroke({
+                            color: 'yellow',
+                            size: 2,
+                        }),
+                        fill: new ol.style.Fill({
+                            color: 'yellow'
+                        })
+                    })
+                })
+            }
+            return [style];
+        }
+        // 创建图层
+        let maplayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        });
+        // 图形图层
+        let layer = new ol.layer.Vector({
+            source: new ol.source.Vector(),
+            style: shapeStyleFunction
+        });
+        // 创建地图
+        let map = new ol.Map({
+            layers: [maplayer, layer],
+            view: new ol.View({
+                center: [104.06, 30.67],
+                zoom: 17,
+                projection: 'EPSG:4326'
+            }),
+            target: 'map'
+        });
+
+        // 绘制三角形中心点
+        let shape = new ol.Feature({
+            geometry: new ol.geom.Point([104.06, 30.67])
+        });
+        shape.set('type', 'shape');
+        layer.getSource().addFeature(shape);
+
+        // 绘制四边形中心点
+        let squareShape = new ol.Feature({
+            geometry: new ol.geom.Point([104.0612, 30.6712])
+        });
+        squareShape.set('type', 'square');
+        layer.getSource().addFeature(squareShape);
+
+        // 绘制五角星
+        let starShape = new ol.Feature({
+            geometry: new ol.geom.Point([104.061, 30.671])
+        });
+        starShape.set('type', 'star');
+        layer.getSource().addFeature(starShape);
+    </script>
+</body>
+
+</html>

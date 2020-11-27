@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>control 控件</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id='map'></div>
+    <!-- 引入openlayers -->
+    <script src="https://openlayers.org/en/v5.3.0/build/ol.js"></script>
+    <script>
+        let map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: new ol.proj.transform([104.06, 30.67], 'EPSG:4326', 'EPSG:3857'),
+                zoom: 17
+            }),
+            controls: new ol.control.defaults().extend([
+                new ol.control.Attribution(), // 地图信息
+                new ol.control.FullScreen(), // 全屏控件
+                new ol.control.Zoom(), // 缩放按钮
+                new ol.control.OverviewMap(), // 鸟瞰图
+                new ol.control.Rotate(), // 指北针
+                new ol.control.MousePosition(), // 鼠标位置
+            ])
+        })
+    </script>
+</body>
+
+</html>

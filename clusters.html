@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openlayers 坐标点集群</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id='map'></div>
+    <!-- 引入openlayers -->
+    <script src="https://openlayers.org/en/v5.3.0/build/ol.js"></script>
+    <script>
+        // 创建高德图层
+        let OSMlayer = new ol.layer.Tile({
+            // source: new ol.source.OSM()
+            source: new ol.source.XYZ({
+                url: 'http://webst0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}'
+            })
+        });
+        // 初始化地图
+        let map = new ol.Map({
+            layers: [OSMlayer], // 设置地图所有图层
+            view: new ol.View({
+                center: new ol.proj.transform(
+                    [103.9271879196, 30.7462617980], 'EPSG:4326', 'EPSG:3857'
+                ),
+                zoom: 5
+            }),
+            target: 'map'
+        });
+        // 散列点坐标
+        let pointArr = [
+            [104.1005229950, 30.6743128087],
+            [104.1005229950, 30.6743128087],
+            [103.9271879196, 30.7462617980],
+            [103.6227035522, 30.9932085864],
+            [103.5752069950, 31.4663367378],
+            [103.4307861328, 30.1941019446],
+            [106.5885615349, 29.5679608922],
+            [106.4500522614, 29.5811456252],
+            [107.7666950226, 29.4161988273],
+            [118.1862562895, 24.4891501310],
+            [118.1982564926, 24.4947641146],
+            [79.1592185000, 12.9721456000],
+            [80.2164941000, 12.9914031000],
+        ]
+        // 散列点资源vector
+        let source = new ol.source.Vector();
+        // 集群点按坐标生成对应feature
+        for (let i = 0; i < pointArr.length; i++) {
+            const item = pointArr[i];
+            let feature = new ol.Feature({
+                geometry: new ol.geom.Point(
+                    new ol.proj.transform(item, 'EPSG:4326', 'EPSG:3857')
+                )
+            });
+            // 将散列点feature添加到散列点资源source中
+            source.addFeature(feature);
+        }
+
+        // 创建集群资源
+        let clusterSource = new ol.source.Cluster({
+            distance: 50,
+            source: source
+        });
+        // 集群点图层
+        let clusterLayer = new ol.layer.Vector({
+            source: clusterSource,
+            style: feature => {
+                return setClusterStyle(feature);
+            }
+        });
+        // 集群点样式，聚合后样式
+        function setClusterStyle(feature) {
+            let features = feature.get('features'); // feature.get('features')这一步得到的是feature所在的集群的feature数组
+            let size = features.length;
+            let style = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 18,
+                    stroke: new ol.style.Stroke({
+                        color: 'red'
+                    }),
+                    fill: new ol.style.Fill({
+                        color: 'red'
+                    })
+                }),
+                text: new ol.style.Text({
+                    font: '15px sans-serif',
+                    text: size.toString(), // 数字需要toString()转换
+                    fill: new ol.style.Fill({
+                        color: '#fff'
+                    })
+                })
+            });
+            return style;
+        }
+        // 集群点图层添加到地图图层
+        map.addLayer(clusterLayer);
+    </script>
+</body>
+
+</html>
